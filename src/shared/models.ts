@@ -205,6 +205,33 @@ export function getModelFamilyForRequest(req: Request): ModelFamily {
   return (req.modelFamily = modelFamily);
 }
 
+export function getServiceForModel(model: string): LLMService {
+  if (
+    model.startsWith("gpt") ||
+    model.startsWith("text-embedding-ada") ||
+    model.startsWith("dall-e")
+  ) {
+    // https://platform.openai.com/docs/models/model-endpoint-compatibility
+    return "openai";
+  } else if (model.startsWith("claude-")) {
+    // https://console.anthropic.com/docs/api/reference#parameters
+    return "anthropic";
+  } else if (model.includes("gemini")) {
+    // https://developers.generativeai.google.com/models/language
+    return "google-ai";
+  } else if (model.includes("mistral")) {
+    // https://docs.mistral.ai/platform/endpoints
+    return "mistral-ai";
+  } else if (model.startsWith("anthropic.claude")) {
+    // AWS offers models from a few providers
+    // https://docs.aws.amazon.com/bedrock/latest/userguide/model-ids-arns.html
+    return "aws";
+  } else if (model.startsWith("azure")) {
+    return "azure";
+  }
+  throw new Error(`Unknown service for model '${model}'`);
+}
+
 function assertNever(x: never): never {
   throw new Error(`Called assertNever with argument ${x}.`);
 }

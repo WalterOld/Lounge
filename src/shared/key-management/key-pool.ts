@@ -4,8 +4,13 @@ import os from "os";
 import schedule from "node-schedule";
 import { config } from "../../config";
 import { logger } from "../../logger";
-import { LLMService, MODEL_FAMILY_SERVICE, ModelFamily } from "../models";
-import { Key, Model, KeyProvider } from "./index";
+import {
+  getServiceForModel,
+  LLMService,
+  MODEL_FAMILY_SERVICE,
+  ModelFamily,
+} from "../models";
+import { Key, KeyProvider, Model } from "./index";
 import { AnthropicKeyProvider, AnthropicKeyUpdate } from "./anthropic/provider";
 import { OpenAIKeyProvider, OpenAIKeyUpdate } from "./openai/provider";
 import { GoogleAIKeyProvider } from "./google-ai/provider";
@@ -42,7 +47,7 @@ export class KeyPool {
   }
 
   public get(model: Model): Key {
-    const service = this.getServiceForModel(model);
+    const service = getServiceForModel(model);
     return this.getKeyProvider(service).get(model);
   }
 
@@ -72,7 +77,7 @@ export class KeyPool {
   public available(model: Model | "all" = "all"): number {
     return this.keyProviders.reduce((sum, provider) => {
       const includeProvider =
-        model === "all" || this.getServiceForModel(model) === provider.service;
+        model === "all" || getServiceForModel(model) === provider.service;
       return sum + (includeProvider ? provider.available() : 0);
     }, 0);
   }
@@ -107,33 +112,6 @@ export class KeyPool {
 
     const provider = this.getKeyProvider(service);
     provider.recheck();
-  }
-
-  private getServiceForModel(model: Model): LLMService {
-    if (
-      model.startsWith("gpt") ||
-      model.startsWith("text-embedding-ada") ||
-      model.startsWith("dall-e")
-    ) {
-      // https://platform.openai.com/docs/models/model-endpoint-compatibility
-      return "openai";
-    } else if (model.startsWith("claude-")) {
-      // https://console.anthropic.com/docs/api/reference#parameters
-      return "anthropic";
-    } else if (model.includes("gemini")) {
-      // https://developers.generativeai.google.com/models/language
-      return "google-ai";
-    } else if (model.includes("mistral")) {
-      // https://docs.mistral.ai/platform/endpoints
-      return "mistral-ai";
-    } else if (model.startsWith("anthropic.claude")) {
-      // AWS offers models from a few providers
-      // https://docs.aws.amazon.com/bedrock/latest/userguide/model-ids-arns.html
-      return "aws";
-    } else if (model.startsWith("azure")) {
-      return "azure";
-    }
-    throw new Error(`Unknown service for model '${model}'`);
   }
 
   private getKeyProvider(service: LLMService): KeyProvider {
