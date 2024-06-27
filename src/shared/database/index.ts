@@ -23,7 +23,11 @@ export async function initializeDatabase() {
   log.info("Initializing database...");
 
   const sqlite3 = await import("better-sqlite3");
-  database = sqlite3.default(config.sqliteDataPath);
+  database = sqlite3.default(config.sqliteDataPath, {
+    verbose: process.env.SQLITE_VERBOSE === "true"
+      ? (msg, ...args) => log.debug({ args }, String(msg))
+      : undefined,
+  });
   migrateDatabase();
   database.pragma("journal_mode = WAL");
   log.info("Database initialized.");
@@ -86,4 +90,5 @@ function assertNumber(value: unknown): asserts value is number {
     throw new Error("Expected number");
   }
 }
-export { EventLogEntry } from "./repos/event";
+
+export { EventLogEntry } from "./repos/events";

@@ -3,8 +3,8 @@
 import type { HttpRequest } from "@smithy/types";
 import { Express } from "express-serve-static-core";
 import { APIFormat, Key } from "./key-management";
-import { User } from "./users/schema";
 import { LLMService, ModelFamily } from "./models";
+import { User } from "./database/repos/users";
 
 declare global {
   namespace Express {

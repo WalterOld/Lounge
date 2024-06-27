@@ -9,15 +9,10 @@ import { parseSort, sortBy, paginate } from "../../shared/utils";
 import { keyPool } from "../../shared/key-management";
 import { LLMService, MODEL_FAMILIES } from "../../shared/models";
 import { getTokenCostUsd, prettyTokens } from "../../shared/stats";
-import {
-  User,
-  UserPartialSchema,
-  UserSchema,
-  UserTokenCounts,
-} from "../../shared/users/schema";
 import { getLastNImages } from "../../shared/file-storage/image-history";
 import { blacklists, parseCidrs, whitelists } from "../../shared/cidr";
 import { invalidatePowHmacKey } from "../../user/web/pow-captcha";
+import { User, UserPartialSchema, UserSchema, UserTokenCounts } from "../../shared/database/repos/users";
 
 const router = Router();
 

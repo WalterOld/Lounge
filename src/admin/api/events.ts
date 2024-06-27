@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { z } from "zod";
 import { encodeCursor, decodeCursor } from "../../shared/utils";
-import { eventsRepo } from "../../shared/database/repos/event";
+import { eventsRepo } from "../../shared/database/repos/events";
 
 const router = Router();
 

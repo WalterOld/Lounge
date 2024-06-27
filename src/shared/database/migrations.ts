@@ -58,4 +58,65 @@ export const migrations = [
       );
     },
   },
+  {
+    name: "add users schema",
+    version: 4,
+    up: (db) => {
+      // language=SQLite
+      const sql = `
+          CREATE TABLE IF NOT EXISTS users
+          (
+              token          TEXT PRIMARY KEY                                        NOT NULL,
+              nickname       TEXT,
+              type           TEXT CHECK (type IN ('normal', 'special', 'temporary')) NOT NULL,
+              createdAt      INTEGER                                                 NOT NULL,
+              lastUsedAt     INTEGER,
+              disabledAt     INTEGER,
+              disabledReason TEXT,
+              expiresAt      INTEGER,
+              maxIps         INTEGER,
+              adminNote      TEXT
+          );
+
+          CREATE TABLE IF NOT EXISTS user_ips
+          (
+              userToken TEXT NOT NULL,
+              ip        TEXT NOT NULL,
+              PRIMARY KEY (userToken, ip),
+              FOREIGN KEY (userToken) REFERENCES users (token)
+          );
+
+          CREATE TABLE IF NOT EXISTS user_token_counts
+          (
+              userToken    TEXT    NOT NULL,
+              modelFamily  TEXT    NOT NULL,
+              inputTokens  INTEGER NOT NULL,
+              outputTokens INTEGER NOT NULL,
+              tokenLimit   INTEGER NOT NULL,
+              prompts      INTEGER NOT NULL,
+              PRIMARY KEY (userToken, modelFamily)
+          );
+
+          CREATE TABLE IF NOT EXISTS user_meta
+          (
+              userToken TEXT NOT NULL,
+              key       TEXT NOT NULL,
+              value     TEXT NOT NULL,
+              PRIMARY KEY (userToken, key),
+              FOREIGN KEY (userToken) REFERENCES users (token)
+          );
+      `;
+      db.exec(sql);
+    },
+    down: (db) => {
+      // language=SQLite
+      const sql = `
+      DROP TABLE users;
+      DROP TABLE user_ips;
+      DROP TABLE user_token_counts;
+      DROP TABLE user_meta;
+      `;
+      db.exec(sql);
+    },
+  },
 ] satisfies Migration[];

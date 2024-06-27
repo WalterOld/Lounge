@@ -1,6 +1,6 @@
 import { config } from "../../config";
 import type { EventLogEntry } from "../database";
-import { eventsRepo } from "../database/repos/event";
+import { eventsRepo } from "../database/repos/events";
 
 export const logEvent = (payload: Omit<EventLogEntry, "date">) => {
   if (!config.eventLogging) {

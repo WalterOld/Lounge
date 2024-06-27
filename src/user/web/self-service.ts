@@ -1,9 +1,9 @@
 import { Router } from "express";
-import { UserPartialSchema } from "../../shared/users/schema";
 import * as userStore from "../../shared/users/user-store";
 import { ForbiddenError, BadRequestError } from "../../shared/errors";
 import { sanitizeAndTrim } from "../../shared/utils";
 import { config } from "../../config";
+import { UserPartialSchema } from "../../shared/database/repos/users";
 
 const router = Router();
 

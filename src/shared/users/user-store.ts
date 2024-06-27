@@ -22,9 +22,9 @@ import {
   ModelFamily,
 } from "../models";
 import { logger } from "../../logger";
-import { User, UserTokenCounts, UserUpdate } from "./schema";
 import { APIFormat } from "../key-management";
 import { assertNever } from "../utils";
+import { User, UserTokenCounts, UserUpdate } from "../database/repos/users";
 
 const log = logger.child({ module: "users" });
 
